@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// ── Node structure ─────────────────────────────────────
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// ── Queue structure ────────────────────────────────────
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
+
+// ── Create a new node ──────────────────────────────────
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// ── Create an empty queue ──────────────────────────────
+struct Queue* createQueue() {
+    struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue));
+    q->front = NULL;
+    q->rear  = NULL;
+    return q;
+}
+
+// ── is_empty ───────────────────────────────────────────
+int is_empty(struct Queue* q) {
+    return q->front == NULL;
+}
+
+// ── enqueue ────────────────────────────────────────────
+void enqueue(struct Queue* q, int data) {
+    struct Node* newNode = createNode(data);
+    if (is_empty(q)) {
+        q->front = newNode;
+        q->rear  = newNode;
+    } else {
+        q->rear->next = newNode;
+        q->rear       = newNode;
+    }
+    printf("Enqueued: %d\n", data);
+}
+
+// ── dequeue ────────────────────────────────────────────
+int dequeue(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    struct Node* temp = q->front;
+    int data          = temp->data;
+    q->front          = q->front->next;
+    if (q->front == NULL) {
+        q->rear = NULL;   // queue is now empty
+    }
+    free(temp);
+    return data;
+}
+
+// ── front ──────────────────────────────────────────────
+int front(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue is empty\n");
+        return -1;    // acts as None
+    }
+    return q->front->data;
+}
+
+// ── print queue ────────────────────────────────────────
+void printQueue(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue: [empty]\n");
+        return;
+    }
+    struct Node* temp = q->front;
+    printf("Queue (front -> rear): ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// ── free memory ────────────────────────────────────────
+void freeQueue(struct Queue* q) {
+    while (!is_empty(q)) {
+        dequeue(q);
+    }
+    free(q);
+}
+
+// ── Main ───────────────────────────────────────────────
+int main() {
+    struct Queue* q = createQueue();
+
+    printf("=== Enqueue 10, 20, 30, 40 ===\n");
+    enqueue(q, 10);
+    enqueue(q, 20);
+    enqueue(q, 30);
+    enqueue(q, 40);
+
+    printQueue(q);
+
+    printf("\nFront element : %d\n", front(q));
+    printf("Is empty?     : %s\n", is_empty(q) ? "Yes" : "No");
+
+    printf("\n=== Dequeue twice ===\n");
+    printf("Removed: %d\n", dequeue(q));
+    printf("Removed: %d\n", dequeue(q));
+
+    printQueue(q);
+    printf("Front element : %d\n", front(q));
+
+    printf("\n=== Dequeue remaining ===\n");
+    while (!is_empty(q)) {
+        printf("Removed: %d\n", dequeue(q));
+    }
+
+    printf("\nUnderflow test:\n");
+    dequeue(q);
+    printf("Front test on empty queue: ");
+    front(q);
+    printf("Is empty?     : %s\n", is_empty(q) ? "Yes" : "No");
+
+    freeQueue(q);
+    return 0;
+}
