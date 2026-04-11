@@ -1,0 +1,81 @@
+#include <stdio.h>
+
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+    int capacity;
+} Stack;
+
+void initStack(Stack* s) {
+    s->top = -1;
+    s->capacity = MAX;
+}
+
+void push(Stack* s, int data) {
+    if (s->top == s->capacity - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->arr[++(s->top)] = data;
+    printf("Pushed %d\n", data);
+}
+int pop(Stack* s) {
+    if (s->top == -1) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    printf("Popped %d\n", s->arr[s->top]);
+    return s->arr[(s->top)--];
+}
+int peek(Stack* s) {
+    if (s->top == -1) {
+        printf("Stack is empty\n");
+        return -1;
+    }
+    printf("Top element(peek):\n", s->arr[s->top]);
+    return s->arr[s->top];
+}
+
+/* Empty check - returns 1 if empty, 0 if not empty */
+int empty(Stack* s) {
+    printf("Is stack empty:");
+    if (s->top == -1) {
+        printf("True\n");
+        return 1;
+    }
+    printf("False\n");
+    return 0;
+}
+void displayStatus(Stack* s) {
+    if (s->top == -1)
+        printf("Stack Empty\n");
+    else {
+        printf("Elements: ");
+        for (int i = 0; i <= s->top; i++) {
+            printf("%d ", s->arr[i]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    Stack stack;
+    initStack(&stack);
+
+    push(&stack, 10);
+    push(&stack, 20);
+    push(&stack, 30);
+    push(&stack, 44);
+     printf("After pushing:\n");
+    displayStatus(&stack);
+
+    printf("%d\n", pop(&stack));
+    printf("%d\n", peek(&stack));
+    empty(&stack);
+
+    printf("\nFinal stack after all operations:\n");
+    displayStatus(&stack);
+    return 0;
+}
