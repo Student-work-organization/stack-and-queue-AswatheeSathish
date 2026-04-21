@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// ── Queue structure ────────────────────────────────────
+struct Queue {
+    int* arr;
+    int front;
+    int rear;
+    int size;
+    int capacity;
+};
+
+// ── Create queue ───────────────────────────────────────
+struct Queue* createQueue(int capacity) {
+    struct Queue* q    = (struct Queue*)malloc(sizeof(struct Queue));
+    q->arr             = (int*)malloc(capacity * sizeof(int));
+    q->front           = 0;
+    q->rear            = -1;
+    q->size            = 0;
+    q->capacity        = capacity;
+    return q;
+}
+
+// ── is_empty ───────────────────────────────────────────
+int is_empty(struct Queue* q) {
+    return q->size == 0;
+}
+
+// ── is_full ────────────────────────────────────────────
+int is_full(struct Queue* q) {
+    return q->size == q->capacity;
+}
+
+// ── enqueue ────────────────────────────────────────────
+void enqueue(struct Queue* q, int data) {
+    if (is_full(q)) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    q->rear          = (q->rear + 1) % q->capacity;  // wrap around
+    q->arr[q->rear]  = data;
+    q->size++;
+    printf("Enqueued: %d\n", data);
+}
+
+// ── dequeue ────────────────────────────────────────────
+int dequeue(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int data   = q->arr[q->front];
+    q->front   = (q->front + 1) % q->capacity;       // wrap around
+    q->size--;
+    return data;
+}
+
+// ── front ──────────────────────────────────────────────
+int front(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue is empty (None)\n");
+        return -1;
+    }
+    return q->arr[q->front];
+}
+
+// ── print queue ────────────────────────────────────────
+void printQueue(struct Queue* q) {
+    if (is_empty(q)) {
+        printf("Queue: [empty]\n");
+        return;
+    }
+    printf("Queue (front -> rear): ");
+    for (int i = 0; i < q->size; i++) {
+        printf("%d ", q->arr[(q->front + i) % q->capacity]);
+    }
+    printf("\n");
+}
+
+// ── free memory ────────────────────────────────────────
+void freeQueue(struct Queue* q) {
+    free(q->arr);
+    free(q);
+}
+
+// ── Main ───────────────────────────────────────────────
+int main() {
+    int capacity;
+    printf("Enter queue capacity: ");
+    scanf("%d", &capacity);
+
+    struct Queue* q = createQueue(capacity);
+
+    printf("\n=== Enqueue 10, 20, 30, 40 ===\n");
+    enqueue(q, 10);
+    enqueue(q, 20);
+    enqueue(q, 30);
+    enqueue(q, 40);
+
+    printQueue(q);
+
+    printf("\nOverflow test:\n");
+    enqueue(q, 50);   // triggers overflow if capacity = 4
+
+    printf("\nFront element : %d\n", front(q));
+    printf("Is empty?     : %s\n", is_empty(q) ? "Yes" : "No");
+
+    printf("\n=== Dequeue twice ===\n");
+    printf("Removed: %d\n", dequeue(q));
+    printf("Removed: %d\n", dequeue(q));
+
+    printQueue(q);
+
+    printf("\n=== Enqueue 50 (reuses freed slots) ===\n");
+    enqueue(q, 50);   // wraps around circularly
+    printQueue(q);
+
+    printf("\n=== Dequeue remaining ===\n");
+    while (!is_empty(q)) {
+        printf("Removed: %d\n", dequeue(q));
+    }
+
+    printf("\nUnderflow test:\n");
+    dequeue(q);
+    printf("Front test on empty: ");
+    front(q);
+    printf("Is empty?     : %s\n", is_empty(q) ? "Yes" : "No");
+
+    freeQueue(q);
+    return 0;
+}

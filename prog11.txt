@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* next;
+};
+struct Stack {
+    struct Node* top;
+};
+void push(struct Stack* stack, int data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+
+    new_node->data = data;
+    new_node->next = stack->top;
+    stack->top = new_node;
+
+    printf("Pushed %d\n", data);
+}
+
+int pop(struct Stack* stack) {
+    if (stack->top == NULL) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+
+    struct Node* temp = stack->top;
+    int popped_value = temp->data;
+
+    stack->top = stack->top->next;
+    free(temp);
+
+    printf("popped :\n", popped_value);
+    return popped_value;
+}
+int peek(struct Stack* stack) {
+    if (stack->top == NULL) {
+        printf("Stack is empty\n");
+        return -1;
+    }
+
+    printf("Peek(top element):\n", stack->top->data);
+    return stack->top->data;
+}
+int empty(struct Stack* stack) {
+    printf("Is stack empty:");
+    if (stack->top == NULL) {
+        printf("True\n");
+        return 1;
+    }
+    printf("False\n");
+    return 0;
+}
+void displayStatus(struct Stack* stack) {
+    if (stack->top == NULL) {
+        printf("Stack Empty\n");
+        return;
+    }
+
+    printf("Elements are: ");
+    struct Node* current = stack->top;
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Stack stack;
+    stack.top = NULL;
+    push(&stack, 10);
+    push(&stack, 20);
+    push(&stack, 30);
+
+    printf("After pushing:\n");
+    displayStatus(&stack);
+
+    printf("%d\n", pop(&stack));
+    printf("%d\n", peek(&stack));
+    empty(&stack);
+
+    printf("Final stack after all operations:\n");
+    displayStatus(&stack);
+
+    return 0;
+}
